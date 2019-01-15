@@ -8,7 +8,8 @@ class Mouse:
 
     @property
     def pos(self):
-        return terminal.state(terminal.TK_MOUSE_X), terminal.state(terminal.TK_MOUSE_Y)
+        return terminal.state(terminal.TK_MOUSE_X),\
+               terminal.state(terminal.TK_MOUSE_Y)
 
     @property
     def cx(self):
@@ -21,7 +22,7 @@ class Mouse:
     @property
     def lbutton_pressed(self):
         if key == terminal.TK_MOUSE_LEFT:
-            #print "Clicked on Layer: {0}".format(self.active_layer)
+            # print "Clicked on Layer: {0}".format(self.active_layer)
             return True
         else:
             return False
@@ -51,13 +52,15 @@ class Mouse:
         else:
             button_pressed = self.lbutton_pressed
 
-        if button_pressed and x <= mouse.cx <= x + w - 1 and y <= mouse.cy <= y + h - 1:
+        if (button_pressed
+                and x <= mouse.cx <= x + w - 1
+                and y <= mouse.cy <= y + h - 1):
             result = True
         else:
             return False
 
         if layer >= self.active_layer:
-            #print "mod"
+            # print "mod"
             self.active_layer = layer
             return result
         else:
@@ -71,7 +74,8 @@ class Mouse:
             return False
 
         if layer >= self.active_layer:
-            #print "Layer {0} is > {1}, setting.".format(layer, self.active_layer)
+            # print "Layer {0} is > {1}, setting.".format(layer,
+            # self.active_layer)
             self.active_layer = layer
             return result
         else:

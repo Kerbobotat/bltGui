@@ -1,8 +1,10 @@
-import bltInput as Input
+import bltGui.Input as Input
 from bearlibterminal import terminal
-from bltControl import bltControl as Control
+from bltGui.Control import Control as Control
 
-class bltButton(Control):
+
+class Button(Control):
+
     def __init__(self, owner, x, y,  text, function=None, length=None):
         Control.__init__(self, ['hover', 'pressed'])
         self.owner = owner
@@ -49,25 +51,49 @@ class bltButton(Control):
             if self.hover:
                 if self.pressed:
                     terminal.color('darkest grey')
-                    terminal.puts(x + self.x, y + self.y, "[U+2584]" * self.length)
-                    terminal.puts(x + self.x, y + self.y + 1, "[U+2588]" * self.length)
-                    terminal.puts(x + self.x, y + self.y + 2, "[U+2580]" * self.length)
+                    terminal.puts(x + self.x,
+                                  y + self.y,
+                                  "[U+2584]" * self.length)
+                    terminal.puts(x + self.x,
+                                  y + self.y + 1,
+                                  "[U+2588]" * self.length)
+                    terminal.puts(x + self.x,
+                                  y + self.y + 2,
+                                  "[U+2580]" * self.length)
                     terminal.color('darker grey')
-                    terminal.puts(x + self.x, y + self.y + 1, str(self.text).center(self.length, " "))
+                    terminal.puts(x + self.x,
+                                  y + self.y + 1,
+                                  str(self.text).center(self.length, " "))
                     return self.function()
                 terminal.color(self.back)
-                terminal.puts(x + self.x, y + self.y, "[U+2584]" * self.length)
-                terminal.puts(x + self.x, y + self.y + 1, "[U+2588]" * self.length)
-                terminal.puts(x + self.x, y + self.y + 2, "[U+2580]" * self.length)
+                terminal.puts(x + self.x,
+                              y + self.y,
+                              "[U+2584]" * self.length)
+                terminal.puts(x + self.x,
+                              y + self.y + 1,
+                              "[U+2588]" * self.length)
+                terminal.puts(x + self.x,
+                              y + self.y + 2,
+                              "[U+2580]" * self.length)
                 terminal.color(self.fore)
-                terminal.puts(x + self.x, y + self.y + 1, str(self.text).center(self.length, " "))
+                terminal.puts(x + self.x,
+                              y + self.y + 1,
+                              str(self.text).center(self.length, " "))
             else:
                 terminal.color(self.back_alt)
-                terminal.puts(x + self.x, y + self.y, "[U+2584]" * self.length)
-                terminal.puts(x + self.x, y + self.y + 1, "[U+2588]" * self.length)
-                terminal.puts(x + self.x, y + self.y + 2, "[U+2580]" * self.length)
+                terminal.puts(x + self.x,
+                              y + self.y,
+                              "[U+2584]" * self.length)
+                terminal.puts(x + self.x,
+                              y + self.y + 1,
+                              "[U+2588]" * self.length)
+                terminal.puts(x + self.x,
+                              y + self.y + 2,
+                              "[U+2580]" * self.length)
                 terminal.color(self.fore_alt)
-                terminal.puts(x + self.x, y + self.y + 1, str(self.text).center(self.length, " "))
+                terminal.puts(x + self.x,
+                              y + self.y + 1,
+                              str(self.text).center(self.length, " "))
             self.dirty = False
 
     def update(self):
@@ -93,17 +119,17 @@ class bltButton(Control):
             self.pressed = False
 
     def do_nothing(self):
-        #print "Did Nothin'....."
+        # print "Did Nothin'....."
         pass
 
     def close(self):
-        #print "Close?"
+        # print "Close?"
         self.owner.visible = False
         self.owner.dirty = True
         pass
 
     def resize(self):
-        #print "Resize!"
+        # print "Resize!"
         self.owner.resizing = True
         pass
 
@@ -119,33 +145,42 @@ class bltButton(Control):
         pass
 
 
-class bltCloseFrameButton(bltButton):
+class CloseFrameButton(Button):
     def __init__(self, owner):
-        bltButton.__init__(self, owner, owner.width - 1, 0,  "X", length=1, function=bltButton.close)
+        Button.__init__(self, owner, owner.width - 1, 0, "X",
+                        length=1, function=Button.close)
         self.frame_element = True
+
     def draw(self):
         if self.dirty:
             terminal.layer(self.owner.layer)
             if self.hover:
                 terminal.color(self.back)
-                terminal.puts(self.owner.pos.x + self.x, self.owner.pos.y + self.y, "[U+2588]" * self.length)
+                terminal.puts(self.owner.pos.x + self.x,
+                              self.owner.pos.y + self.y,
+                              "[U+2588]" * self.length)
                 terminal.color(self.fore)
-                terminal.puts(self.owner.pos.x + self.x, self.owner.pos.y + self.y,
+                terminal.puts(self.owner.pos.x + self.x,
+                              self.owner.pos.y + self.y,
                               str(self.text).center(self.length, " "))
             else:
                 terminal.color(self.back_alt)
-                terminal.puts(self.owner.pos.x + self.x, self.owner.pos.y + self.y, "[U+2588]" * self.length)
+                terminal.puts(self.owner.pos.x + self.x,
+                              self.owner.pos.y + self.y,
+                              "[U+2588]" * self.length)
                 terminal.color(self.fore_alt)
-                terminal.puts(self.owner.pos.x + self.x, self.owner.pos.y + self.y,
+                terminal.puts(self.owner.pos.x + self.x,
+                              self.owner.pos.y + self.y,
                               str(self.text).center(self.length, " "))
             self.dirty = False
 
     def resized(self):
         self.x = self.owner.width - 1
 
-class bltResizeFrameButton(bltButton):
+class ResizeFrameButton(Button):
     def __init__(self, owner):
-        bltButton.__init__(self, owner, owner.width - 1, owner.height-1,  "[U+2195]", length=1, function=bltButton.resize)
+        Button.__init__(self, owner, owner.width - 1, owner.height - 1,
+                           "[U+2195]", length=1, function=Button.resize)
         self.frame_element = True
 
     def draw(self):
@@ -153,15 +188,21 @@ class bltResizeFrameButton(bltButton):
             terminal.layer(self.owner.layer)
             if self.hover:
                 terminal.color(self.back)
-                terminal.puts(self.owner.pos.x + self.x, self.owner.pos.y + self.y, "[U+2588]" * self.length)
+                terminal.puts(self.owner.pos.x + self.x,
+                              self.owner.pos.y + self.y,
+                              "[U+2588]" * self.length)
                 terminal.color(self.fore)
-                terminal.puts(self.owner.pos.x + self.x, self.owner.pos.y + self.y,
+                terminal.puts(self.owner.pos.x + self.x,
+                              self.owner.pos.y + self.y,
                               str(self.text).center(self.length, " "))
             else:
                 terminal.color(self.back_alt)
-                terminal.puts(self.owner.pos.x + self.x, self.owner.pos.y + self.y, "[U+2588]" * self.length)
+                terminal.puts(self.owner.pos.x + self.x,
+                              self.owner.pos.y + self.y,
+                              "[U+2588]" * self.length)
                 terminal.color(self.fore_alt)
-                terminal.puts(self.owner.pos.x + self.x, self.owner.pos.y + self.y,
+                terminal.puts(self.owner.pos.x + self.x,
+                              self.owner.pos.y + self.y,
                               str(self.text).center(self.length, " "))
             self.dirty = False
 
@@ -170,9 +211,12 @@ class bltResizeFrameButton(bltButton):
         self.y = self.owner.height - 1
 
 
-class bltCheckBoxButton(bltButton):
-    def __init__(self, owner, x, y, label="", checked=False, function=bltButton.toggle):
-        bltButton.__init__(self, owner, x, y,  "( )", length=1, function=function)
+class CheckBoxButton(Button):
+    def __init__(self, owner, x, y, label="", checked=False,
+                 function=Button.toggle):
+        Button.__init__(self, owner, x, y, "( )",
+                        length=1, function=function)
+
         self.checked_text = "(X)"
         self.frame_element = False
         self.checked = checked
@@ -189,15 +233,25 @@ class bltCheckBoxButton(bltButton):
             terminal.layer(self.owner.layer)
             if self.hover:
                 terminal.color(self.back)
-                terminal.puts(self.owner.pos.x + self.x, self.owner.pos.y + self.y, "[U+2588]" * self.length)
+                terminal.puts(self.owner.pos.x + self.x,
+                              self.owner.pos.y + self.y,
+                              "[U+2588]" * self.length)
                 terminal.color(self.fore)
-                terminal.puts(self.owner.pos.x + self.x, self.owner.pos.y + self.y, text)
+                terminal.puts(self.owner.pos.x + self.x,
+                              self.owner.pos.y + self.y,
+                              text)
             else:
                 terminal.color(self.back_alt)
-                terminal.puts(self.owner.pos.x + self.x, self.owner.pos.y + self.y, "[U+2588]" * self.length)
+                terminal.puts(self.owner.pos.x + self.x,
+                              self.owner.pos.y + self.y,
+                              "[U+2588]" * self.length)
                 terminal.color(self.fore_alt)
-                terminal.puts(self.owner.pos.x + self.x, self.owner.pos.y + self.y, text)
-            terminal.puts(self.owner.pos.x + self.x + self.length + 1, self.owner.pos.y + self.y, self.label)
+                terminal.puts(self.owner.pos.x + self.x,
+                              self.owner.pos.y + self.y,
+                              text)
+            terminal.puts(self.owner.pos.x + self.x + self.length + 1,
+                          self.owner.pos.y + self.y,
+                          self.label)
             self.dirty = False
 
     def update(self):

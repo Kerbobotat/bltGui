@@ -1,8 +1,10 @@
-from bltButton import *
+from bltGui.Button import *
 from bearlibterminal import terminal
-from bltControl import bltControl as Control
+from bltGui.Control import Control
 
-class bltRadio(Control):
+
+class Radio(Control):
+
     def __init__(self, owner, x, y, control_list=None, label=""):
         Control.__init__(self, ['changed'])
         self.owner = owner
@@ -18,25 +20,27 @@ class bltRadio(Control):
 
 
         self.control_list.append(
-            bltCheckBoxButton(self.owner, 1 + x, 1 + y, label="Option 1", checked=False, function=bltButton.select))
+            CheckBoxButton(self.owner, 1 + x, 1 + y, label="Option 1",
+                           checked=False, function=Button.select))
         self.control_list.append(
-            bltCheckBoxButton(self.owner, 1 + x, 2 + y, label="Option 2", checked=True, function=bltButton.select))
+            CheckBoxButton(self.owner, 1 + x, 2 + y, label="Option 2",
+                           checked=True, function=Button.select))
         self.control_list.append(
-            bltCheckBoxButton(self.owner, 1 + x, 3 + y, label="Option 3", checked=False, function=bltButton.select))
-
+            CheckBoxButton(self.owner, 1 + x, 3 + y, label="Option 3",
+                           checked=False, function=Button.select))
 
     def draw(self):
 
         if self.dirty:
-            terminal.puts(self.owner.pos.x + self.x, self.owner.pos.y + self.y, self.label)
+            terminal.puts(self.owner.pos.x + self.x,
+                          self.owner.pos.y + self.y,
+                          self.label)
             if self.control_list:
                 for c in self.control_list:
                     c.dirty = True
                     c.draw()
             self.dispatch('changed', self.selected())
             self.dirty = False
-
-
 
     def update(self):
         if self.control_list:
@@ -49,7 +53,7 @@ class bltRadio(Control):
             if change_result[1]:
                 for i, c in enumerate(self.control_list):
                     if i != change_result[0]:
-                        #print "Changed others"
+                        # print "Changed others"
                         c.checked = False
                         c.dirty = True
                         self.dirty = True

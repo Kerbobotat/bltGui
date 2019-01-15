@@ -1,12 +1,14 @@
 from bearlibterminal import terminal
-import bltSkins
-import bltInput
-from bltControl import bltControl as Control
-mouse = bltInput.mouse
+import bltGui.Skins as Skins
+from bltGui import Input
+from bltGui.Control import Control
 
+mouse = Input.mouse
 
-class bltTextBox(Control):
-    def __init__(self, owner, x, y, text="", length=4, color='white', bkcolor='black', frame=None, skin='SINGLE'):
+class TextBox(Control):
+
+    def __init__(self, owner, x, y, text="", length=4,
+                 color='white', bkcolor='black', frame=None, skin='SINGLE'):
         Control.__init__(self, ['active', 'changed'])
         self.owner = owner
         self.x = x
@@ -15,7 +17,7 @@ class bltTextBox(Control):
         self.length = length
         self.color = color
         self.bkcolor = bkcolor
-        self.skin = bltSkins.GLYPH_SKINS[skin]
+        self.skin = Skins.GLYPH_SKINS[skin]
         self.active = False
         self.dirty = True
         self.frame_element = False
@@ -32,7 +34,9 @@ class bltTextBox(Control):
                 y = 0
 
             terminal.color(self.bkcolor)
-            terminal.puts(self.x + 1 + x, self.y + y, self.skin['BACKGROUND'] * self.length)
+            terminal.puts(self.x + 1 + x,
+                          self.y + y,
+                          self.skin['BACKGROUND'] * self.length)
             terminal.color(self.color)
 
             if self.active:
@@ -40,10 +44,14 @@ class bltTextBox(Control):
                 self.active = False
 
             terminal.color(self.bkcolor)
-            terminal.puts(self.x + 1 + x, self.y + y, self.skin['BACKGROUND'] * self.length)
+            terminal.puts(self.x + 1 + x,
+                          self.y + y,
+                          self.skin['BACKGROUND'] * self.length)
             terminal.color(self.color)
-            #print self.text
-            terminal.puts(self.x + x + 1, self.y + y, self.text[:self.length])
+            # print self.text
+            terminal.puts(self.x + x + 1,
+                          self.y + y,
+                          self.text[:self.length])
             self.dirty = False
 
     def update(self):
@@ -59,14 +67,17 @@ class bltTextBox(Control):
         if mouse.clicked_rect(self.x + x, self.y + y, self.length, 1):
             terminal.layer(layer)
             terminal.color('white')
-            terminal.puts(self.x + 1 + x, self.y + y, self.skin['BACKGROUND'] * self.length)
+            terminal.puts(self.x + 1 + x,
+                          self.y + y,
+                          self.skin['BACKGROUND'] * self.length)
             terminal.color('black')
             terminal.refresh()
-            result, text = terminal.read_str(self.x + x + 1, self.y + y, self.text, self.length)
+            result, text = terminal.read_str(self.x + x + 1,
+                                             self.y + y,
+                                             self.text,
+                                             self.length)
             terminal.refresh()
             self.text = text
-
-
 
             self.active = True
             self.dirty = True
