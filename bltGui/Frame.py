@@ -1,23 +1,24 @@
-from bearlibterminal import terminal
-from collections import namedtuple
-import bltInput
-from bltButton import bltButton
 import textwrap
-import bltSkins
-import bltColor as Color
-from bltControl import bltControl as Control
+from collections import namedtuple
 from types import *
 
+from bearlibterminal import terminal
+
+from bltGui.Button import Button
+from bltGui.Control import Control as Control
+import bltGui.Input as Input
+import bltGui.Skins as Skins
+
 Pos = namedtuple('Pos', 'x y')
-mouse = bltInput.mouse
+mouse = Input.mouse
 
 
-
-class bltFrame(Control):
-
+class Frame(Control):
     layer_index = 10
 
-    def __init__(self, x, y, w ,h, title=None, frame=True, layer=None, text="", draggable=False, visible=True, skin=None, color_skin=None):
+    def __init__(self, x, y, w, h, title=None, frame=True, layer=None, text="",
+                 draggable=False, visible=True, skin=None, color_skin=None):
+
         Control.__init__(self, ['close', 'show'])
         self.pos = Pos(x, y)
         self.width = w
@@ -28,8 +29,8 @@ class bltFrame(Control):
 
         self.frame = frame
         if layer is None:
-            self.layer = bltFrame.layer_index
-            bltFrame.layer_index += 1
+            self.layer = Frame.layer_index
+            Frame.layer_index += 1
         else:
             self.layer = layer
         self.print_queue = []
@@ -39,13 +40,13 @@ class bltFrame(Control):
         self.visible = visible
         self.controls = []
         if skin:
-            self.skin = dict(bltSkins.GLYPH_SKINS[skin])
+            self.skin = dict(Skins.GLYPH_SKINS[skin])
         else:
-            self.skin = dict(bltSkins.GLYPH_SKINS['SINGLE'])
+            self.skin = dict(Skins.GLYPH_SKINS['SINGLE'])
         if color_skin:
-            self.color_skin = dict(bltSkins.COLOR_SKINS[color_skin])
+            self.color_skin = dict(Skins.COLOR_SKINS[color_skin])
         else:
-            self.color_skin = dict(bltSkins.COLOR_SKINS['DEFAULT'])
+            self.color_skin = dict(Skins.COLOR_SKINS['DEFAULT'])
         self._dirty = True
         self.hover = False
         self.clicked = False
@@ -85,22 +86,21 @@ class bltFrame(Control):
         self.text = value
         self.dirty = True
 
-
     def clear(self):
-        #print "Clearing Layer: {0}".format(self.layer)
+        # print "Clearing Layer: {0}".format(self.layer)
         terminal.layer(self.layer)
         terminal.clear_area(self.pos.x, self.pos.y, self.width, self.height)
 
     def draw(self):
         if self.visible and self.dirty:
-            #print "Drawing Frame: {0}, {1}".format(self.title, self.dirty)
+            # print "Drawing Frame: {0}, {1}".format(self.title, self.dirty)
             self.clear()
             self._draw_frame()
-            #print self.controls
+            # print self.controls
             for c in self.controls:
-                if c.frame_element == True:
+                if c.frame_element:
                     c.draw()
-                elif c.y < self.height-2:
+                elif c.y < self.height - 2:
                     c.draw()
             self.dirty = False
         elif not self.visible and self.dirty:
@@ -111,7 +111,6 @@ class bltFrame(Control):
             text = text()
         text = textwrap.dedent(text).strip()
         return textwrap.wrap(text, self.width - 2)
-
 
     def update(self):
         for c in self.controls:
@@ -129,7 +128,7 @@ class bltFrame(Control):
             offset_x1 = self.width
             offset_x2 = 0
 
-        #print "Layer: {0}".format(self.layer)
+        # print "Layer: {0}".format(self.layer)
         terminal.layer(self.layer)
 
         for x1 in range(self.width):
@@ -145,34 +144,47 @@ class bltFrame(Control):
                     terminal.color(self.color)
                 '''
                 terminal.color(self.color_skin['BKCOLOR'])
-                terminal.puts(x1 + self.pos.x, y1 + self.pos.y, self.skin['BACKGROUND'])
+                terminal.puts(x1 + self.pos.x, y1 + self.pos.y,
+                              self.skin['BACKGROUND'])
                 terminal.color(self.color_skin['COLOR'])
                 if self.frame:
                     # Colors
                     if (x1, y1) == (0, 0):
-                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y, self.skin['BOX_NW'])
+                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y,
+                                      self.skin['BOX_NW'])
                     elif (x1, y1) == (self.width - 1, 0):
-                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y, self.skin['BOX_NE'])
+                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y,
+                                      self.skin['BOX_NE'])
                     elif (x1, y1) == (0, self.height - 1):
-                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y, self.skin['BOX_SW'])
+                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y,
+                                      self.skin['BOX_SW'])
                     elif (x1, y1) == (self.width - 1, self.height - 1):
-                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y, self.skin['BOX_SE'])
+                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y,
+                                      self.skin['BOX_SE'])
                     elif x1 == self.width - 1:
-                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y, self.skin['BOX_E'])
+                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y,
+                                      self.skin['BOX_E'])
                     elif x1 == 0:
-                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y, self.skin['BOX_W'])
+                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y,
+                                      self.skin['BOX_W'])
                     elif y1 == self.height - 1 or (y1 == 0 and not self.title):
-                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y, self.skin['BOX_S'])
+                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y,
+                                      self.skin['BOX_S'])
                     elif y1 == 0 and self.title and (
-                            x1 < offset_x1 or x1 > self.width - offset_x2 - 1):  # + self.pos.x:
-                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y, self.skin['BOX_N'])
+                            x1 < offset_x1 or x1 > self.width - offset_x2 - 1):
+                        # + self.pos.x:
+                        terminal.puts(x1 + self.pos.x, y1 + self.pos.y,
+                                      self.skin['BOX_N'])
 
                 # DEBUG
-                #terminal.puts(self.pos.x + 1, self.pos.y + 1, "Layer: {0}".format(self.layer) )
-                #terminal.puts(self.pos.x + 1, self.pos.y + 3, "Hover: {0}".format(self.hover))
-                #terminal.puts(self.pos.x + 1, self.pos.y + 4, "Clicked on: {0}".format(self.clicked))
-                #terminal.puts(self.pos.x + 1, self.pos.y + 5, ": {0}".format(self.layer))
-
+                # terminal.puts(self.pos.x + 1,
+                # self.pos.y + 1, "Layer: {0}".format(self.layer) )
+                # terminal.puts(self.pos.x + 1,
+                # self.pos.y + 3, "Hover: {0}".format(self.hover))
+                # terminal.puts(self.pos.x + 1,
+                # self.pos.y + 4, "Clicked on: {0}".format(self.clicked))
+                # terminal.puts(self.pos.x + 1,
+                # self.pos.y + 5, ": {0}".format(self.layer))
 
         ''' DRAW TEXT'''
 
@@ -190,19 +202,22 @@ class bltFrame(Control):
 
         for p in self.print_queue:
             text = textwrap.dedent(p[2]).strip()
-            terminal.puts(p[0] + self.pos.x, p[1] + self.pos.y, textwrap.fill(text, self.width - 2))
+            terminal.puts(p[0] + self.pos.x, p[1] + self.pos.y,
+                          textwrap.fill(text, self.width - 2))
 
     def _test_mouse(self):
-        if mouse.hover_rect(self.pos.x, self.pos.y, self.width, self.height, layer=self.layer):
+        if mouse.hover_rect(self.pos.x, self.pos.y, self.width, self.height,
+                            layer=self.layer):
             self.hover = True
             if mouse.lbutton_pressed:
                 self.clicked = True
                 self.clear()
-                self.layer = bltFrame.layer_index
-                bltFrame.layer_index += 1
+                self.layer = Frame.layer_index
+                Frame.layer_index += 1
             else:
                 self.clicked = False
-            if mouse.clicked_rect(self.pos.x, self.pos.y, self.width, 1, layer=self.layer) and self.draggable:
+            if mouse.clicked_rect(self.pos.x, self.pos.y, self.width, 1,
+                                  layer=self.layer) and self.draggable:
                 self.dragging = True
             else:
                 if mouse.active_layer > self.layer:
@@ -216,17 +231,18 @@ class bltFrame(Control):
                 self.clicked = False
                 self.dirty = True
 
-        #print "Layer: {0}, Mouse.ActiveLayer: {1}".format(self.layer, mouse.active_layer)
+        # print "Layer: {0}, Mouse.ActiveLayer: {1}".format(self.layer, mouse.active_layer)
 
         '''
-        if mouse.lbutton_pressed and self.pos.x <= mouse.cx <= self.pos.x + self.width and mouse.cy == self.pos.y:
+        if mouse.lbutton_pressed and self.pos.x <= mouse.cx <= self.pos.x
+         + self.width and mouse.cy == self.pos.y:
             self.dragging = True
         '''
         if mouse.lbutton and self.dragging:
             if self.click_x is None:
                 self.click_x = mouse.cx - self.pos.x
             self.clear()
-            self.pos = Pos(mouse.cx - self.click_x, mouse.cy) # (width / 2)
+            self.pos = Pos(mouse.cx - self.click_x, mouse.cy)  # (width / 2)
 
             self.dragging = True
             self.dirty = True
@@ -278,13 +294,14 @@ class bltFrame(Control):
             self.controls.append(control)
 
 
-class bltModalFrame(bltFrame):
-    def __init__(self, *args, **kwargs):
-        bltFrame.__init__(self, *args, **kwargs)
+class ModalFrame(Frame):
 
-        #self.background = bltFrame(0, 0, 80, 24, bkcolor=Color("200,255,255,255"))
-        self.add_control(bltButton(self, 2, 2, "1", function=bltButton.close))
-        self.add_control(bltButton(self, 4, 2, "2", function=bltButton.close))
+    def __init__(self, *args, **kwargs):
+        Frame.__init__(self, *args, **kwargs)
+
+        # self.background = bltFrame(0, 0, 80, 24, bkcolor=Color("200,255,255,255"))
+        self.add_control(Button(self, 2, 2, "1", function=Button.close))
+        self.add_control(Button(self, 4, 2, "2", function=Button.close))
 
     '''
     def draw(self):
@@ -296,22 +313,32 @@ class bltModalFrame(bltFrame):
     '''
 
 
-class bltShowListFrame(bltFrame):
+class ShowListFrame(Frame):
+
     def __init__(self, *args, **kwargs):
-        bltFrame.__init__(self, *args, **kwargs)
+        Frame.__init__(self, *args, **kwargs)
 
     def get_dispatch(self, value):
-        print "Things!"
+        print("Things!")
         if value == 0:
             self.text = "[c=red]Item 1[/c] This is the first item on the list!."
         if value == 1:
-            self.text = "[c=red]Item 2[/c] This is the second item on the list!. And its really long ... alkjdshflkashdfkasdfkshxdtfhas  selhf dsa fjsadf aslkdf salkdf alkskjhs  jidskf asefa sfas saehf lasdf lausd f"
-        if value == 2 :
+            self.text = ("[c=red]Item 2[/c] This is the second item on the"
+                         " list!. And its really long ... "
+                         "alkjdshflkashdfkasdfkshxdtfhas  "
+                         "selhf dsa fjsadf aslkdf salkdf alkskjhs"
+                         "jidskf asefa sfas saehf lasdf lausd f")
+        if value == 2:
             self.text = "[c=red]Item 3[/c] This one is not."
         if value == 3:
-            self.text = "[c=red]Item 4[/c] Last one! 01011001010 0 10 10101 010 1 1 01 0 0 0 1100010 10 "
+            self.text = ("[c=red]Item 4[/c] Last one! 01011001010 0 10 "
+                         "10101 010 1 1 01 0 0 0 1100010 10 ")
         self.dirty = True
 
 
-
-
+if __name__ == '__main__':
+    control_frame = Frame(55, 30, 20, 15,
+                             "Control Test",
+                          visible=True,
+                          draggable=True,
+                          skin='SOLID')

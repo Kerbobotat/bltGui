@@ -1,10 +1,10 @@
-from bltButton import *
+from bltGui.Button import *
 from bearlibterminal import terminal
-from bltGui import bltSkins as Skins
-from bltControl import bltControl as Control
+from bltGui import Skins as Skins
+from bltGui.Control import Control
 
 
-class bltListbox(Control):
+class ListBox(Control):
     def __init__(self, owner, x, y, items, collapse=False):
         Control.__init__(self, ['hover', 'changed'])
         self.owner = owner
@@ -38,8 +38,10 @@ class bltListbox(Control):
             y = 0
 
         if self.expanded:
-            if mouse.hover_rect(self.x + x, self.y + y, self.length + 1, len(self.items)):
-                if mouse.hover_rect(self.x + x + self.length, self.y + y, 1, 1) and self.collapse:
+            if mouse.hover_rect(self.x + x, self.y + y,
+                                self.length + 1, len(self.items)):
+                if mouse.hover_rect(self.x + x + self.length,
+                                    self.y + y, 1, 1) and self.collapse:
 
                     self.hover = True
                     if mouse.lbutton_pressed:
@@ -49,7 +51,8 @@ class bltListbox(Control):
                     self.hover = True
                     self.hover_index = mouse.cy - (self.y + self.owner.pos.y)
                     if mouse.lbutton_pressed:
-                        self.selected_index = mouse.cy - (self.y + self.owner.pos.y)
+                        self.selected_index = mouse.cy - \
+                                              (self.y + self.owner.pos.y)
                         self.dispatch('changed', self.selected_index)
                         if self.collapse:
                             self.expanded = False
@@ -60,7 +63,8 @@ class bltListbox(Control):
                 self.hover = False
                 self.pressed = False
                 self.hover_index = -1
-        elif mouse.hover_rect(self.x + x + self.length, self.y + y, 1, 1) and self.collapse:
+        elif mouse.hover_rect(self.x + x + self.length,
+                              self.y + y, 1, 1) and self.collapse:
             self.hover = True
             if mouse.lbutton_pressed:
                 self.expanded = True
@@ -83,14 +87,21 @@ class bltListbox(Control):
                     bkcolor = self.colors['BKSELECTED']
 
                 if bkcolor is not None:
-                    terminal.puts(self.x + self.owner.pos.x, self.y + self.owner.pos.y + i, "[c={0}]".format(bkcolor) + str("[U+2588]" * (self.length+1)))
-                terminal.puts(self.x + self.owner.pos.x, self.y + self.owner.pos.y + i, "[c={0}]{2}".format(color, bkcolor, item))
+                    terminal.puts(self.x + self.owner.pos.x,
+                                  self.y + self.owner.pos.y + i,
+                                  "[c={0}]".format(bkcolor) +
+                                  str("[U+2588]" * (self.length+1)))
+                terminal.puts(self.x + self.owner.pos.x,
+                              self.y + self.owner.pos.y + i,
+                              "[c={0}]{2}".format(color, bkcolor, item))
 
             if self.collapse:
                 bkcolor = self.colors['SELECTED']
-                terminal.puts(self.x + self.owner.pos.x + self.length, self.y + self.owner.pos.y,
+                terminal.puts(self.x + self.owner.pos.x + self.length,
+                              self.y + self.owner.pos.y,
                               "[c={0}]".format(bkcolor) + str("[U+2588]"))
-                terminal.puts(self.x + self.owner.pos.x + self.length, self.y + self.owner.pos.y,
+                terminal.puts(self.x + self.owner.pos.x + self.length,
+                              self.y + self.owner.pos.y,
                               "[c={0}]".format(color) + str("[U+25BC]"))
             self.dirty = False
         if self.dirty and not self.expanded:
@@ -98,21 +109,26 @@ class bltListbox(Control):
             color = self.colors['COLOR']
             bkcolor = self.colors['BKCOLOR']
 
-
             i = self.selected_index
 
-
             if bkcolor is not None:
-                terminal.puts(self.x + self.owner.pos.x, self.y + self.owner.pos.y , "[c={0}]".format(bkcolor) + str("[U+2588]" * self.length))
+                terminal.puts(self.x + self.owner.pos.x,
+                              self.y + self.owner.pos.y,
+                              "[c={0}]".format(bkcolor) +
+                              str("[U+2588]" * self.length))
             if self.selected_index is not None:
                 item = self.items[i]
-                terminal.puts(self.x + self.owner.pos.x, self.y + self.owner.pos.y, "[c={0}]{2}".format(color, bkcolor, item))
+                terminal.puts(self.x + self.owner.pos.x,
+                              self.y + self.owner.pos.y,
+                              "[c={0}]{2}".format(color, bkcolor, item))
 
             if self.collapse:
                 bkcolor = self.colors['BKCOLOR']
-                terminal.puts(self.x + self.owner.pos.x + self.length, self.y + self.owner.pos.y,
+                terminal.puts(self.x + self.owner.pos.x + self.length,
+                              self.y + self.owner.pos.y,
                               "[c={0}]".format(bkcolor) + str("[U+2588]"))
-                terminal.puts(self.x + self.owner.pos.x + self.length, self.y + self.owner.pos.y,
+                terminal.puts(self.x + self.owner.pos.x + self.length,
+                              self.y + self.owner.pos.y,
                               "[c={0}]".format(color) + str("[U+25B2]"))
 
             self.dirty = False
